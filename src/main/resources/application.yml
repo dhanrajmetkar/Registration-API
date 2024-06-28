@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/register
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  application:
+    name: USER-SERVICE
+
+  spring:
+      mail:
+        host: smtp.gmail.com
+        port: 587
+        username: dhanrajmetkar3660@gmail.com
+        password: rvqz ackl sooo omgk
+        properties:
+          mail:
+            smtp:
+              auth: true
+              starttls:
+                enable: true
