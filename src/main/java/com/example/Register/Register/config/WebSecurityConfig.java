@@ -1,12 +1,15 @@
 package com.example.Register.Register.config;
 
-import jakarta.servlet.http.HttpServlet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.server.servlet.OAuth2AuthorizationServerAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -18,23 +21,35 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 @Configuration
 public class WebSecurityConfig {
+
+    private final UserDetailsService userDetailsService;
+    public PasswordEncoder passwordEncoder;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(11);
     }
+
+    @Autowired
+    public WebSecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .cors(withDefaults()) // Configure CORS if needed
                 .csrf(csrf -> csrf.disable()) // Disable CSRF if needed
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/**", "/hello", "/register","/verifyRegistration/**","/resendVerificationToken/**","/savePassword/**","/resetPassword/**","/changePassword").permitAll() // Whitelist specific endpoints
+                        .requestMatchers("/**", "/hello", "/register", "/verifyRegistration/**", "/resendVerificationToken/**", "/savePassword/**", "/resetPassword/**", "/changePassword").permitAll() // Whitelist specific endpoints
                         .anyRequest().authenticated() // Require authentication for all other endpoints
                 )
-                .httpBasic(withDefaults()); // Use HTTP Basic authentication
-
+                .httpBasic(withDefaults())
+                .formLogin(withDefaults())
+                .logout(withDefaults());
         return http.build();
     }
+
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -52,6 +67,4 @@ public class WebSecurityConfig {
 
         return mailSender;
     }
-
-
 }
